@@ -257,6 +257,22 @@
     </form>
   </section>
 
+  <!-- Firebase: Cargar librerías -->
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    // Configurar Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyC256qUCBK6HiEfpmInXpIpM4d8-jC7BvU",
+      authDomain: "digitalizacion-5a7b7.firebaseapp.com",
+      projectId: "digitalizacion-5a7b7"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
+
   <script>
     // Toggle menú móvil
     const menuToggle = document.getElementById('menu-toggle');
@@ -283,7 +299,7 @@
     window.addEventListener('scroll', checkSectionVisibility);
     window.addEventListener('load', checkSectionVisibility);
 
-    // Validación del formulario
+    // Validación y envío a Firebase
     const form = document.getElementById('contact-form');
     const nombre = document.getElementById('nombre');
     const email = document.getElementById('email');
@@ -293,12 +309,10 @@
     const errorEmail = document.getElementById('error-email');
     const errorMensaje = document.getElementById('error-mensaje');
 
-    form.addEventListener('submit', e => {
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
 
       let valid = true;
-
-      // Limpia errores
       errorNombre.textContent = '';
       errorEmail.textContent = '';
       errorMensaje.textContent = '';
@@ -323,10 +337,20 @@
       }
 
       if(valid) {
-        alert('Formulario enviado correctamente. ¡Gracias!');
-        form.reset();
+        db.collection("contactos").add({
+          nombre: nombre.value,
+          email: email.value,
+          mensaje: mensaje.value,
+          fecha: new Date()
+        }).then(() => {
+          alert("Guardado en Firebase!");
+          form.reset();
+        }).catch((error) => {
+          console.error("Error al guardar:", error);
+        });
       }
     });
   </script>
+
 </body>
 </html>
